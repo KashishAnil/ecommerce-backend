@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const { body } = require('express-validator');
+const requireAuth = require('../middleware/auth');
 
 //CRUD -> Create, Read, Update, Delete
 
@@ -16,7 +17,7 @@ router.get('/', async (req,res)=>{
 });
 
 //Post a product
-router.post('/', async (req,res) => 
+router.post('/', requireAuth, async (req,res) => 
 {
     try{
         let products_added = await Product.create(req.body);
@@ -27,7 +28,7 @@ router.post('/', async (req,res) =>
 });
 
 //Update a product 
-router.put('/:id', async (req, res)=>{
+router.put('/:id',requireAuth, async (req, res)=>{
     try{
             let updated = await Product.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true});
             if (!updated) {
@@ -42,9 +43,9 @@ router.put('/:id', async (req, res)=>{
 });
 
 //Delete a product 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
     try{
-        let deleted = await Product.findByIdAndUpdate(req.params.id, {new:true, isActive: false} );
+        let deleted = await Product.findByIdAndUpdate(req.params.id, {isActive: false}, {new:true}  );
         if(!deleted) {
             res.status(404).json({error: 'Product not found'});
         }

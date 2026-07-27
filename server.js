@@ -16,6 +16,9 @@ app.use('/products', productRoutes); //adding this to the list of methods: funct
 const categoryRoutes = require('./routes/categories');
 app.use('/categories', categoryRoutes);
 
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes);
+
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server is running');
 });
