@@ -23,4 +23,17 @@ try{
 }
 }
 
-module.exports = requireAuth;
+//this function is used to verify that it is the correct role for the route handler. for example, only sellers should be able to edit products. so if updating route is called, we need to check that the role of the user is that of the seller. This function generalizes role checking by allowing multiple roles to be put in through the rest operator ...arguments
+function requireRole(...allowedRoles){ //...allowedRoles is a rest operator. means it will take all arguments that are passed. 
+   return (req,res,next)=>{ //// requireRole doesn't do the actual role check itself — it returns a NEW middleware
+    // function (req, res, next) => {...} that performs the check, with allowedRoles
+    // "remembered" via closure from whatever roles were passed into requireRole(...). We need to use this here because we cant pass ...allowedRoles otherwise. if the function was like 
+    //function requireRole(req,res,next,...allowedRoles)=>{ /... }  this wont work bcs the middleware function takes only three arguments: req,res,next. 
+    if(!allowedRoles.includes(req.user.role)){ //checks whether the role of the user making the route request is within the list of allowedRoles.
+        return res.status(403).json({error: 'Insufficient permissions'}); //returns error if role is not allowed to make this request. 
+    }
+    next(); //carry on otherwise. 
+   }
+}
+
+module.exports = {requireAuth, requireRole};
