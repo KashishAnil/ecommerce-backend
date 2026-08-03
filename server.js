@@ -3,7 +3,6 @@ const express = require('express')
 const mongoose = require('mongoose')
 const app=express();
 
-app.use(express.json());
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
@@ -21,6 +20,14 @@ app.use('/auth', authRoutes);
 
 const cartRoutes = require('./routes/cart');
 app.use('/cart', cartRoutes);
+
+const orderRoutes = require('./routes/orders');
+app.use('/orders', orderRoutes);
+
+const paymentsRoutes = require('./routes/payments');
+app.use('/payments', paymentsRoutes);
+
+app.use(express.json());
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Server is running');

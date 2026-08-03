@@ -13,7 +13,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 //                                  search whether the product that we want to add is already in the cart.if yes, increase the quantity. else, add the product to cart and return the cart. 
 router.post('/', requireAuth, requireRole('Customer'), async(req,res)=>{
 try{
-    let cart = await Cart.findOne({user: req.user.userId}); //find the user whose cart this is
+    let cart = await Cart.findOne({user: req.user.userId}); //find the user whose cart this is 
     if(!cart){ 
         cart= await Cart.create({
             user: req.user.userId,
@@ -62,10 +62,17 @@ router.get('/', requireAuth, requireRole('Customer'), async(req,res)=>{
         if(!cartExists){
             return res.status(403).json({error: "Cart is Empty"});
         }
+        //calculate total
+        let total = cart.items.reduce((sum, item)=>{
+            return sum + (item.product.price * item.product.quantity);
+        },0);
+
+
+
         // if(req.user.userId!=cartExists.Id){
         //     return res.status(403).json({error: "You do not own this cart"});
         // } dont need this part. this check is required when you fear that a user is accessing another user's cart. however, the cartExists object has the user with that userId so the cart has to belong to this user only. redundant check. 
-        res.json(cartExists);
+        res.json({cartExists,total});
     }catch(error){
         res.status(500).json({error: error.message});
     }

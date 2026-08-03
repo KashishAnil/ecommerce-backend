@@ -43,14 +43,10 @@ const ordersSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: ['unpaid', 'paid'],
-            default: 'unpaid'
+            default: 'unpaid',
+            stripeSessionId: {type: String}, //this is the id for checkout session. A checkout session is a Stripe-hosted webpage to pay customized to every order (each order has different bill and different items).
+            stripePaymentIntentId: {type: String} //this contains all details of what happened at Stripe with the customer. 
         }, 
-        deliveryStatus: {
-            type: String,
-            required: true,
-            enum: ['pending', 'shipped', 'delivered'],
-            default: 'pending'
-        }
     }, 
 
     {
