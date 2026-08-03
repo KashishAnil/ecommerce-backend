@@ -38,4 +38,32 @@ router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
   }
 });
 
+//Get Orders
+
+router.get('/',requireAuth, requireRole('Customer'), async(req,res)=>{
+try{
+  //i want to find the seller of the order and get 
+  let order = await Order.find({user: req.user.userId}); //no need for if(!order) bcs if order is empty, find will return [], which is okay. 
+  res.status(200).json(order);
+}catch(error){
+   res.status(500).json({ error: error.message });
+}
+});
+
+//get an order's details.
+router.get('/:id', requireAuth, requireRole('Customer'), async(req,res)=>{
+  try{
+    let order = await Order.findById(req.params.id);
+    if (!order){
+      return res.status(404).json({error: 'You have not placed any order yet.'});
+    }
+      if (order.user.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'You do not own this order' });
+    } //It is possible to fetch the order of another customer if their order id is given. By writing this, we allow the user to fetch only his order details. 
+    res.json(order);
+  }catch(error){
+    res.status(500).json({error: error.message});
+  }
+})
+
 module.exports = router;
