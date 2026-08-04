@@ -2,23 +2,38 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/Orders');
 const Cart = require('../models/Cart');
+const Product = require('../models/Product')
+const mongoose = require('mongoose');
 const total_Price = require('../utils/total_price');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
 //create order 
-// -> first items go in cart and then order is place. 
+// -> first items go in cart and then order is placed. 
 // -> quantity reduces, cart emptied, items ordered added to order object, payment status updated. 
 router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user.userId }).populate('items.product'); //we want a cart document here that has req.user.userId. However, the Cart Schema references two schemas User and Cart. WWe only have references to those schemas, not the real documents. Here, however, we want to access attributes of referenced schema object so we will need the full document. .populate() gets the full document. 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    let cart = await Cart.findOne({ user: req.user.userId }).populate('items.product').session(session); //we want a cart document here that has req.user.userId. However, the Cart Schema references two schemas User and Cart. WWe only have references to those schemas, not the real documents. Here, however, we want to access attributes of referenced schema object so we will need the full document. .populate() gets the full document. 
 
     if (!cart || cart.items.length === 0) {
+      await session.abortTransaction();
       return res.status(404).json({ error: 'Nothing added to cart yet' }); 
     }
 
-    let order_placed = await Order.create({ 
-      user: req.user.userId, 
-      items: cart.items.map(item => ({ 
+    //we cannot allow an order to be placed if the quantity required here is greater than the quantity available. 
+    //we will have to check the available quantity of all items in the cart. 
+    for (let item of cart.items) {
+      if (item.product.quantityAvailable < item.quantity) {
+      await session.abortTransaction();
+      return res.status(400).json({
+      error: `Not enough stock for ${item.product.productName}`
+    });
+  }
+}
+    let order_placed = await Order.create([{ 
+        user: req.user.userId, 
+        items: cart.items.map(item => ({ 
         product: item.product._id,
         name: item.product.productName,
         priceAtPurchase: item.product.price,
@@ -26,15 +41,25 @@ router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
       })),
       totalPrice: total_Price(cart.items), //calling utils function
       shippingAddress: req.body.shippingAddress 
-    });
+    }],{session, new: true});
+
+    for(let item of cart.items){
+      await Product.findByIdAndUpdate(item.product._id, {
+        $inc: {quantityAvailable: -item.quantity} //inc operator is used to tell the server to look this field up (quantityAvailable in this case) and update it atomically. no read operation or write operation from any other request happens until this is done fully. 
+      }, {session});
+    }
 
     cart.items = []; // need to empty the old cart once the order is placed. 
-    await cart.save();
+    await cart.save({ session });
 
-    res.status(201).json(order_placed);
-
+    await session.commitTransaction();
+    res.status(201).json(order_placed[0]);
+    
   } catch (error) {
+    await session.abortTransaction();
     res.status(500).json({ error: error.message });
+  } finally{
+    session.endSession();
   }
 });
 

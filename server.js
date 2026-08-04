@@ -8,6 +8,13 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('Connection error:', err));
 
+app.use((req, res, next) => {
+  if (req.originalUrl === '/payments/webhook') {
+    next(); // skip JSON parsing for this one route
+  } else {
+    express.json()(req, res, next);
+  }
+});
 //mounting paths on server
 const productRoutes = require('./routes/products'); //imports the router object imported from ./routes/products. This means everything written in routes/products is in productRoutes. 
 app.use('/products', productRoutes); //adding this to the list of methods: function 
