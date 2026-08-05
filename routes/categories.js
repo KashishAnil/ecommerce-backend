@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router(); // .Router() is a mini version of app; meaning it can do everything app can (except server config and making the server listen). express.Router() allows us to write routes separately for different files. then express does the work of tracing when to call which file and which route within each file. 
 const Category = require('../models/Category'); 
+const {requireAuth, requireRole } = require('../middleware/auth');
 
 
 //When routes are created, they are just stored as a pair of the method(GET, POST, DELETE) and the path ('/', '/products') etc. Then, once we get a real request, tracing the path begins and we execute the correct function, if it exists. Otherwise, we return an error. 
@@ -18,7 +19,7 @@ router.get('/', async (req, res) =>{  //We're in Categories.js. if it is GET loc
 
 //POST a new category
 
-router.post('/', async(req,res)=>{
+router.post('/', requireAuth, requireRole("Seller"), async(req,res)=>{
     try{
         let category = await Category.create(req.body);
         res.status(201).json(category);

@@ -58,12 +58,12 @@ try{
 //2- you fetched the cart and now you have its id. but this is circular flaw bcs to have its id, you need to fetch and to fetch, you need id. thus, this wont work. 
 router.get('/', requireAuth, requireRole('Customer'), async(req,res)=>{
     try{
-        let cartExists = await Cart.findOne({user: req.user.userId});
+        let cartExists = await Cart.findOne({user: req.user.userId}).populate('items.product');
         if(!cartExists){
             return res.status(403).json({error: "Cart is Empty"});
         }
         //calculate total
-        let total = cart.items.reduce((sum, item)=>{
+        let total = cartExists.items.reduce((sum, item)=>{
             return sum + (item.product.price * item.product.quantity);
         },0);
 
