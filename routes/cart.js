@@ -112,7 +112,7 @@ router.delete('/:id', requireAuth, requireRole('Customer'), async(req,res)=>{
         }
         cart.items = cart.items.filter(item=> item.product.toString()!=req.params.id); //filter is a js function that iterates on all elements in the array and runs the function on them. if the function returns false for any element, that element is deleted from the array and returns a plain javascript array. 
         await cart.save();
-        res.status(200).json(product_to_be_deleted);
+        res.status(200).json(existingItem);
     }catch(error){
         res.status(500).json({error: error.message});
     }
