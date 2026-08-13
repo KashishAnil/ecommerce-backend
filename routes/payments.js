@@ -23,8 +23,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
                 quantity: item.quantity
             })), 
             mode: 'payment', //one-time payment
-            success_url: 'http://localhost:3000/payments/success', //if the payment is successful, customer will be redirected here. 
-            cancel_url: 'http://localhost:3000/payments/cancel', //if the payment is unsuccessful, customer will be redirected here. 
+            success_url: 'https://react.customdev.solutions/shop/success', // Vite frontend thank-you page
+            cancel_url: 'https://react.customdev.solutions/shop/cart',
             metadata: { orderId: order._id.toString() } //we're giving additional info of orderId. 
         }); 
         order.stripeSessionId = session.id; //stripeSessionId is a variable we had in our order schema.  
