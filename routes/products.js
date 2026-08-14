@@ -30,6 +30,7 @@ router.post('/', requireAuth, requireRole('Seller'), async (req,res) =>
     }
 });
 
+//Update product details 
 router.put('/:id', requireAuth, requireRole('Seller'), async (req, res) => {
     try {
         let product = await Product.findById(req.params.id);
@@ -69,8 +70,8 @@ router.delete('/:id', requireAuth, requireRole('Seller'), async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-//Get a certain product
 
+//Get a certain product
 router.get('/:id', async (req,res)=>{
     try{
         let item_retrieved = await Product.findById(req.params.id);
@@ -83,6 +84,22 @@ router.get('/:id', async (req,res)=>{
     } catch(error){
         res.status(500).json({error: error.message});
     }
+});
+
+//Get products by a certain seller 
+router.get('/:id', async(req, res)=>{
+try{
+    let products_by_seller_id = await Product.findById(req.params.id);
+    if(!products_by_seller_id){
+        res.status(404).json({error: 'Add products to see them here'});
+    }
+    else{
+        res.status(200).json(products_by_seller_id);
+    }
+}
+catch(error){
+    res.status(500).json({error: error.message});
+}
 });
 
 module.exports = router;
