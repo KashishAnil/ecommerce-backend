@@ -14,7 +14,7 @@ const {NODE_ENV}=process.env
 
 app.use(cors()); //allowing this enables different websites/ports to talk to each other. backend and frontend live on different ports. By default, ports cannot talk with other ports. Only when you allow cors
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI) 
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log('Connection error:', err));
 

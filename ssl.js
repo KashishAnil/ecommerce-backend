@@ -20,3 +20,6 @@ try {
 }
 
 module.exports = credentials;
+
+//ssl.js is to make website safer. it adds s to http making it https and does encryption-  meaning all data that passes from server to browser and vice versa is encrypted. 
+//This is however conditional on environments. We want this encyrption when we've made it live for the user but not during development. 
