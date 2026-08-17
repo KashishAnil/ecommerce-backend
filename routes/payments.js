@@ -43,7 +43,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
 // if both match, the request is indeed from stripe. if they dont, the request is from somebody else. dont accept. 
 router.post('/webhook', express.raw({type: 'application/json'}), async(req,res)=>{ // the general syntax includes: path, middleware functions, async. generally, middleware func were requireAuth, requireRole.
     //here, it is express.raw({type: 'application/json}). Generally, we write app.use(express.json()) in script.js. What that does is: it takes the content that comes in through req and parses it as JSON and makes a JSON object out of req.body so it is accessible. Here, to recompute the signature, we need raw req.body. Otherwise, the signature wont match. 
-const sig = req.headers['stripe-signature']; //stripe attaches its own signature to header of req. 
+    console.log("line1",req);
+    const sig = req.headers['stripe-signature']; //stripe attaches its own signature to header of req. 
 
 let event;
 try{
