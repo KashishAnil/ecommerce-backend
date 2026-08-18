@@ -28,8 +28,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
             metadata: { orderId: order._id.toString() } //we're giving additional info of orderId. 
         }); 
         order.stripeSessionId = session.id; //stripeSessionId is a variable we had in our order schema.  
-        paymentStatus: 'paid';
-        stripePaymentIntentId: session.payment_intent
+        order.paymentStatus= 'paid';
+        order.stripePaymentIntentId= session.payment_intent
 
         await order.save(); 
         res.json({checkoutUrl: session.url});//returns session url that we then redirect our client's browser to 
