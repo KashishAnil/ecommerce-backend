@@ -60,6 +60,8 @@ router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
     res.status(500).json({ error: error.message });
   } finally{
     session.endSession();
+    console.log({session});
+    
   }
 });
 
