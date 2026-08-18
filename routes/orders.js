@@ -11,8 +11,9 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 // -> first items go in cart and then order is placed. 
 // -> quantity reduces, cart emptied, items ordered added to order object, payment status updated. 
 router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
+  let session;
   try {
-    const session = await mongoose.startSession();
+    session = await mongoose.startSession();
     session.startTransaction();
     let cart = await Cart.findOne({ user: req.user.userId }).populate('items.product').session(session); //we want a cart document here that has req.user.userId. However, the Cart Schema references two schemas User and Cart. WWe only have references to those schemas, not the real documents. Here, however, we want to access attributes of referenced schema object so we will need the full document. .populate() gets the full document. 
 
