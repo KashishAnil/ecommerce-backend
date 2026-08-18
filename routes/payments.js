@@ -28,6 +28,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
             metadata: { orderId: order._id.toString() } //we're giving additional info of orderId. 
         }); 
         order.stripeSessionId = session.id; //stripeSessionId is a variable we had in our order schema.  
+        paymentStatus: 'paid';
+        stripePaymentIntentId: session.payment_intent
 
         await order.save(); 
         res.json({checkoutUrl: session.url});//returns session url that we then redirect our client's browser to 
@@ -54,18 +56,18 @@ try{
 }catch(error){
     return res.status(400).send(`Webhook signature verification failed: ${error.message}`);
   }
-if (event.type==='checkout.session.completed'){
-    const session = event.data.object;
-    const orderId = session.metadata.orderId;
+// if (event.type==='checkout.session.completed'){
+//     // const session = event.data.object;
+//     // const orderId = session.metadata.orderId;
 
-    const successful=await Orders.findByIdAndUpdate(orderId, {
-      paymentStatus: 'paid',
-      stripePaymentIntentId: session.payment_intent
-    });
-    console.log("success", successful);
-}
- res.json({ received: true });
- console.log("function end");
+//     // const successful=await Orders.findByIdAndUpdate(orderId, {
+//     //   paymentStatus: 'paid',
+//     //   stripePaymentIntentId: session.payment_intent
+//     // });
+//     // console.log("success", successful);
+// }
+//  res.json({ received: true });
+//  console.log("function end");
  
 }
 
