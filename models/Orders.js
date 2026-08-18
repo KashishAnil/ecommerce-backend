@@ -8,7 +8,8 @@ const ordersSchema = new mongoose.Schema(
             required: true,
         }, 
         items: [
-            { product: {
+            { 
+             product: {
                         type: mongoose.Schema.Types.ObjectId, 
                         ref: 'Product', 
                         required: true
@@ -43,12 +44,11 @@ const ordersSchema = new mongoose.Schema(
             type: String,
             required: true,
             enum: ['unpaid', 'paid'],
-            default: 'unpaid',
-            stripeSessionId: {type: String}, //this is the id for checkout session. A checkout session is a Stripe-hosted webpage to pay customized to every order (each order has different bill and different items).
-            stripePaymentIntentId: {type: String} //this contains all details of what happened at Stripe with the customer. 
+            default: 'unpaid'
+        },
+        stripeSessionId: {type: String}, //this is the id for checkout session. A checkout session is a Stripe-hosted webpage to pay customized to every order (each order has different bill and different items).
+        stripePaymentIntentId: {type: String} //this contains all details of what happened at Stripe with the customer. 
         }, 
-    }, 
-
     {
         timestamps: true
     }
