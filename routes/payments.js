@@ -53,7 +53,7 @@ let event;
 try{
 
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    if (event.type==='checkout.session.completed' || 'charge.succeeded'){
+    if (event.type==='checkout.session.completed' || event.type==='charge.succeeded'){
         // const session = event.data.object;
         // const orderId = session.metadata.orderId;
     
