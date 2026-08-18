@@ -53,21 +53,21 @@ let event;
 try{
 
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    if (event.type==='checkout.session.completed' || 'charge.succeeded'){
+        // const session = event.data.object;
+        // const orderId = session.metadata.orderId;
+    
+        // const successful=await Orders.findByIdAndUpdate(orderId, {
+        //   paymentStatus: 'paid',
+        //   stripePaymentIntentId: session.payment_intent
+        // });
+        // console.log("success", successful);
+    }
+     res.json({ received: true });
+     console.log("function end");
 }catch(error){
     return res.status(400).send(`Webhook signature verification failed: ${error.message}`);
   }
-// if (event.type==='checkout.session.completed'){
-//     // const session = event.data.object;
-//     // const orderId = session.metadata.orderId;
-
-//     // const successful=await Orders.findByIdAndUpdate(orderId, {
-//     //   paymentStatus: 'paid',
-//     //   stripePaymentIntentId: session.payment_intent
-//     // });
-//     // console.log("success", successful);
-// }
-//  res.json({ received: true });
-//  console.log("function end");
  
 }
 
