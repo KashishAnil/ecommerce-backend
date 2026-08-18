@@ -52,7 +52,9 @@ router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
     cart.items = []; // need to empty the old cart once the order is placed. 
     await cart.save({ session });
 
+
     await session.commitTransaction();
+    console.log({session});
     res.status(201).json(order_placed[0]);
     
   } catch (error) {
@@ -60,7 +62,6 @@ router.post('/', requireAuth, requireRole('Customer'), async (req, res) => {
     res.status(500).json({ error: error.message });
   } finally{
     session.endSession();
-    console.log({session});
     
   }
 });
