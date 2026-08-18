@@ -28,8 +28,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
             metadata: { orderId: order._id.toString() } //we're giving additional info of orderId. 
         }); 
         order.stripeSessionId = session.id; //stripeSessionId is a variable we had in our order schema.  
-        order.paymentStatus= 'paid';
-        order.stripePaymentIntentId= session.payment_intent
+        // order.paymentStatus= 'paid';
+        // order.stripePaymentIntentId= session.payment_intent
 
         await order.save(); 
         res.json({checkoutUrl: session.url});//returns session url that we then redirect our client's browser to 
@@ -54,14 +54,14 @@ try{
 
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
     if (event.type==='checkout.session.completed' || event.type==='charge.succeeded'){
-        // const session = event.data.object;
-        // const orderId = session.metadata.orderId;
+        const session = event.data.object;
+        const orderId = session.metadata.orderId;
     
-        // const successful=await Orders.findByIdAndUpdate(orderId, {
-        //   paymentStatus: 'paid',
-        //   stripePaymentIntentId: session.payment_intent
-        // });
-        // console.log("success", successful);
+        const successful=await Orders.findByIdAndUpdate(orderId, {
+          paymentStatus: 'paid',
+          stripePaymentIntentId: session.payment_intent
+        });
+        console.log("success", successful);
     }
      res.json({ received: true });
      console.log("function end");
