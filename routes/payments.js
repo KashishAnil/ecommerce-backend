@@ -23,8 +23,8 @@ router.post('/checkout/:orderId', requireAuth, requireRole('Customer'), async(re
                 quantity: item.quantity
             })), 
             mode: 'payment', //one-time payment
-            success_url: 'https://react.customdev.solutions/ecommerce-frontend/success',
-            cancel_url: 'https://react.customdev.solutions/ecommerce-frontend/',
+            success_url: req.body.successUrl,
+            cancel_url: req.body.successUrl,
             metadata: { orderId: order._id.toString() } //we're giving additional info of orderId. 
         }); 
         order.stripeSessionId = session.id; //stripeSessionId is a variable we had in our order schema.  
